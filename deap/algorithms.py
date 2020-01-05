@@ -27,7 +27,24 @@ you really want them to do.
 
 import random
 
-import tools
+#mia modifica da "import tools"
+import deap.tools as tools
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+#mia aggiunta per plottare generazioni
+def print_gen(population,toolbox,gen):
+    fits = [toolbox.evaluateResVol(ind) for ind in population]
+    #undef = toolbox.evaluateResVol(np.zeros(len(population[0])))
+    for i in range(len(fits)):
+            plt.plot(-fits[i][1]/(4.859640406752691342e+04*0.04**3), fits[i][0],'b.')
+    plt.plot(-1, 145.6543,'r*')
+    #plt.xlim([-1.005,-0.995])
+    #plt.ylim([142.6543,148.6543])
+    plt.grid(True)
+    plt.savefig("{}.png".format(gen))
+    plt.close()
 
 
 def varAnd(population, toolbox, cxpb, mutpb):
@@ -58,9 +75,9 @@ def varAnd(population, toolbox, cxpb, mutpb):
     mutated version in :math:`P_\mathrm{o}`. The resulting :math:`P_\mathrm{o}`
     is returned.
 
-    This variation is named *And* because of its propensity to apply both
+    This variation is named *And* beceause of its propention to apply both
     crossover and mutation on the individuals. Note that both operators are
-    not applied systematically, the resulting individuals can be generated from
+    not applied systematicaly, the resulting individuals can be generated from
     crossover only, mutation only, crossover and mutation, and reproduction
     according to the given probabilities. Both probabilities should be in
     :math:`[0, 1]`.
@@ -105,7 +122,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
     The algorithm takes in a population and evolves it in place using the
     :meth:`varAnd` method. It returns the optimized population and a
     :class:`~deap.tools.Logbook` with the statistics of the evolution. The
-    logbook will contain the generation number, the number of evaluations for
+    logbook will contain the generation number, the number of evalutions for
     each generation and the statistics if a :class:`~deap.tools.Statistics` is
     given as argument. The *cxpb* and *mutpb* arguments are passed to the
     :func:`varAnd` function. The pseudocode goes as follow ::
@@ -157,7 +174,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
     record = stats.compile(population) if stats else {}
     logbook.record(gen=0, nevals=len(invalid_ind), **record)
     if verbose:
-        print logbook.stream
+        print(logbook.stream)
 
     # Begin the generational process
     for gen in range(1, ngen + 1):
@@ -184,7 +201,10 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
         record = stats.compile(population) if stats else {}
         logbook.record(gen=gen, nevals=len(invalid_ind), **record)
         if verbose:
-            print logbook.stream
+            print(logbook.stream)
+
+        #print_gen(population,toolbox,ngen)
+
 
     return population, logbook
 
@@ -217,7 +237,7 @@ def varOr(population, toolbox, lambda_, cxpb, mutpb):
     selected at random from :math:`P_\mathrm{p}`, cloned and appended to
     :math:`P_\mathrm{o}`.
 
-    This variation is named *Or* because an offspring will never result from
+    This variation is named *Or* beceause an offspring will never result from
     both operations crossover and mutation. The sum of both probabilities
     shall be in :math:`[0, 1]`, the reproduction probability is
     1 - *cxpb* - *mutpb*.
@@ -244,7 +264,6 @@ def varOr(population, toolbox, lambda_, cxpb, mutpb):
 
     return offspring
 
-
 def eaMuPlusLambda(population, toolbox, mu, lambda_, cxpb, mutpb, ngen,
                    stats=None, halloffame=None, verbose=__debug__):
     """This is the :math:`(\mu + \lambda)` evolutionary algorithm.
@@ -269,7 +288,7 @@ def eaMuPlusLambda(population, toolbox, mu, lambda_, cxpb, mutpb, ngen,
     The algorithm takes in a population and evolves it in place using the
     :func:`varOr` function. It returns the optimized population and a
     :class:`~deap.tools.Logbook` with the statistics of the evolution. The
-    logbook will contain the generation number, the number of evaluations for
+    logbook will contain the generation number, the number of evalutions for
     each generation and the statistics if a :class:`~deap.tools.Statistics` is
     given as argument. The *cxpb* and *mutpb* arguments are passed to the
     :func:`varOr` function. The pseudocode goes as follow ::
@@ -308,10 +327,13 @@ def eaMuPlusLambda(population, toolbox, mu, lambda_, cxpb, mutpb, ngen,
     record = stats.compile(population) if stats is not None else {}
     logbook.record(gen=0, nevals=len(invalid_ind), **record)
     if verbose:
-        print logbook.stream
+        print(logbook.stream)
 
     # Begin the generational process
     for gen in range(1, ngen + 1):
+
+        #print_gen(population,toolbox,gen-1)
+
         # Vary the population
         offspring = varOr(population, toolbox, lambda_, cxpb, mutpb)
 
@@ -332,8 +354,10 @@ def eaMuPlusLambda(population, toolbox, mu, lambda_, cxpb, mutpb, ngen,
         record = stats.compile(population) if stats is not None else {}
         logbook.record(gen=gen, nevals=len(invalid_ind), **record)
         if verbose:
-            print logbook.stream
+            print(logbook.stream)
 
+    #print_gen(population,toolbox,ngen)
+    
     return population, logbook
 
 
@@ -361,7 +385,7 @@ def eaMuCommaLambda(population, toolbox, mu, lambda_, cxpb, mutpb, ngen,
     The algorithm takes in a population and evolves it in place using the
     :func:`varOr` function. It returns the optimized population and a
     :class:`~deap.tools.Logbook` with the statistics of the evolution. The
-    logbook will contain the generation number, the number of evaluations for
+    logbook will contain the generation number, the number of evalutions for
     each generation and the statistics if a :class:`~deap.tools.Statistics` is
     given as argument. The *cxpb* and *mutpb* arguments are passed to the
     :func:`varOr` function. The pseudocode goes as follow ::
@@ -409,7 +433,7 @@ def eaMuCommaLambda(population, toolbox, mu, lambda_, cxpb, mutpb, ngen,
     record = stats.compile(population) if stats is not None else {}
     logbook.record(gen=0, nevals=len(invalid_ind), **record)
     if verbose:
-        print logbook.stream
+        print(logbook.stream)
 
     # Begin the generational process
     for gen in range(1, ngen + 1):
@@ -433,7 +457,10 @@ def eaMuCommaLambda(population, toolbox, mu, lambda_, cxpb, mutpb, ngen,
         record = stats.compile(population) if stats is not None else {}
         logbook.record(gen=gen, nevals=len(invalid_ind), **record)
         if verbose:
-            print logbook.stream
+            print(logbook.stream)
+
+        #print_gen(population,toolbox,gen)
+
     return population, logbook
 
 
@@ -458,7 +485,7 @@ def eaGenerateUpdate(toolbox, ngen, halloffame=None, stats=None,
     function and updates the generation method with the :func:`toolbox.update`
     function. It returns the optimized population and a
     :class:`~deap.tools.Logbook` with the statistics of the evolution. The
-    logbook will contain the generation number, the number of evaluations for
+    logbook will contain the generation number, the number of evalutions for
     each generation and the statistics if a :class:`~deap.tools.Statistics` is
     given as argument. The pseudocode goes as follow ::
 
@@ -494,6 +521,8 @@ def eaGenerateUpdate(toolbox, ngen, halloffame=None, stats=None,
         record = stats.compile(population) if stats is not None else {}
         logbook.record(gen=gen, nevals=len(population), **record)
         if verbose:
-            print logbook.stream
+            print(logbook.stream)
+
+        #print_gen(population,toolbox,gen)
 
     return population, logbook
